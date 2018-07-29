@@ -1,2 +1,2 @@
 # Python-Tutorial
-I decided to learn Python for Machine Learning.
+I decided to learn Python for various purposes.
