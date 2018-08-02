@@ -105,3 +105,48 @@ def infinite_looper(objects):
 gen = infinite_looper("Learning Python")
 print(gen.send(9))
 print(gen.send(3))
+
+# yield from <expr> ifadesi generatorlerin icerisinde kullanilabilir. <expr>, icerisinden bir iterator
+# cikartilabilecek bir iterable donduren bir ifade olmalidir. Alttaki generatorler ayni ciktiyi verir
+
+print("\n")
+def gen1():
+	for char in "Python":
+		yield char
+	for i in range(5):
+		yield i
+
+def gen2():
+	yield from "Python"
+	yield from range(5)
+
+for i in gen1():
+	print(i)
+
+for i in gen2():
+	print(i)					
+
+# Asagida generatorlerin icerisinde baska generatorler cagirilarak yield ve yield from kullanimi gosterilmistir
+# Sonuc olarak her iki kullanimda ayni ciktiyi üretir
+
+def cities():
+	for city in ['Istanbul', 'Berlin', 'Beijing', 'LA']:
+		yield city
+
+def squares():
+	for num in range(10):
+		yield num ** 2
+
+def gen_all_in_one():
+	for city in cities():
+		yield city
+	for square in squares():
+		yield square
+
+def gen_splitted():
+	yield from cities()
+	yield from squares()
+
+list1 = [i for i in gen_all_in_one()]
+list2 = [i for i in gen_splitted()]
+print(list1 == list2)				
