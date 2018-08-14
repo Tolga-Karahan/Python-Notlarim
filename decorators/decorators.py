@@ -113,4 +113,136 @@ print(random())
 print(randint(1, 5))
 print(choice([1, 8, 5]))
 
+# Decoratorlar ile runtime esnasinda fonksiyon uzerinde degisiklikler yapabiliriz. 
+# Mesela runtime esnasinda argumanlari kontrol eden bir implementasyon eklenebilir
+
+def argument_test_natural_number(func):
+	def helper(x):
+		if type(x) == int and x > 0:
+			return func(x)
+		else:
+			raise Exception("Argument is not valid")
+	return helper
+	
+@argument_test_natural_number
+def factorial(n):
+	if n == 1:
+		return 1
+	else:
+		return n * factorial(n-1)					
+
+# Baska bir ornekte fonksiyona kac kez cagirildigini sayabilmesini saglayan
+# bir implementasyonu decorator kullanarak ekleyebiliriz
+
+print()
+
+def call_counter(func):
+	def count_calls(*args, **kwargs):
+		count_calls.calls += 1
+		return func(*args, **kwargs)
+
+	count_calls.calls = 0
+	return count_calls
+
+@call_counter
+def succ(x):
+	return x + 1
+
+for i in range(10):
+	succ(i)
+print(succ.calls)				
+
+# Decoratorlar kullanildiktan sonra orjinal fonksiyonun __name__, __doc__ ve __module__
+# attributeleri yok olur. Eger bu attributeleri korumak istiyorsak decorator icerisinde
+# orjinal fonksiyonun yerini alacak olan fonksiyona bu attributeleri atamamiz gerekir
+# ve ya functools modulunden wraps decoratorunu kullanarak bu islemleri bizim icin
+# yapmasini saglayabiliriz
+
+from functools import wraps
+
+def decorator(func):
+	@wraps(func)
+	def function_wrapper():
+		print("After decorating")
+		func()
+
+	return function_wrapper
+
+def f():
+	print("Just a simple function")
+
+print(str(f.__name__) + " " + str(f.__doc__) + " " + str(f.__module__))
+
+f = decorator(f)
+
+print(str(f.__name__) + " " + str(f.__doc__) + " " + str(f.__module__))
+
+# Decoratorler siniflar kullanilarakta tanimlanabilir 
+# Python'da fonksiyonlar cagirilabilen nesnelerdir, fakat ayni zamanda fonksiyonlarin
+# haricinde cagirilabilen nesneler tanimlayabiliriz. Bu durumda nesnenin ait oldugu
+# sinifta, nesne ile cagri yapildiginda cagirilan __call__ metodunu tanimlamamiz gerekir
+
+class Test:
+
+	def __init__(self):
+		print("An instance is instantiated")
+
+	def __call__(self, *args, **kwargs):
+		print("Arguments are ", args, kwargs)
+
+print()
+obj = Test()
+obj(1, 2, "Tolga")
+
+print()
+
+class Fibonacci:
+
+    def __init__(self):
+        self.cache = {}
+
+    def __call__(self, n):
+        if n not in self.cache:
+            if n == 0:
+                self.cache[0] = 0
+            elif n == 1:
+                self.cache[1] = 1
+            else:
+                self.cache[n] = self.__call__(n-1) + self.__call__(n-2)
+        return self.cache[n]
+
+fib = Fibonacci()
+
+for i in range(15):
+    print(fib(i), end=", ")
+print()
+# Fonksiyon ile tanimlanmis basit bir decorator ve ayni isi yapan sinif ile tanimlanmis bir
+# decorator ornegi verelim
+
+def decorator(func):
+	def function_wrapper():
+		print("Decorating " + func.__name__)
+		func()
+	return function_wrapper
+	
+class Decorator_Class:
+
+	def __init__(self, f):
+		self.f = f
+
+	def __call__(self):
+		print("Decorating ", self.f.__name__)
+		self.f()	
+
+
+def func():
+	print("Just a simple function")
+
+print()
+
+#func = decorator(func)
+#print(func())
+
+func  = Decorator_Class(func)
+print(func())						
 
