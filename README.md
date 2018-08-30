@@ -1,2 +1,2 @@
-# Python-Tutorial
-I decided to learn Python for various purposes.
+# Python-Notlarim
+Python ile alakali tuttugum cesitli notlar.
